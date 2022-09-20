@@ -1,0 +1,474 @@
+# BEGIN WP Rocket v3.8.1
+# Use UTF-8 encoding for anything served text/plain or text/html
+AddDefaultCharset UTF-8
+# Force UTF-8 for a number of file formats
+<IfModule mod_mime.c>
+AddCharset UTF-8 .atom .css .js .json .rss .vtt .xml
+</IfModule>
+# FileETag None is not enough for every server.
+<IfModule mod_headers.c>
+Header unset ETag
+</IfModule>
+# Since we’re sending far-future expires, we don’t need ETags for static content.
+# developer.yahoo.com/performance/rules.html#etags
+FileETag None
+<IfModule mod_alias.c>
+<FilesMatch "\.(html|htm|rtf|rtx|txt|xsd|xsl|xml)$">
+<IfModule mod_headers.c>
+Header set X-Powered-By "WP Rocket/3.8.1"
+Header unset Pragma
+Header append Cache-Control "public"
+Header unset Last-Modified
+</IfModule>
+</FilesMatch>
+<FilesMatch "\.(css|htc|js|asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|otf|odb|odc|odf|odg|odp|ods|odt|ogg|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|wav|wma|wri|xla|xls|xlsx|xlt|xlw|zip)$">
+<IfModule mod_headers.c>
+Header unset Pragma
+Header append Cache-Control "public"
+</IfModule>
+</FilesMatch>
+</IfModule>
+# Expires headers (for better cache control)
+<IfModule mod_expires.c>
+	ExpiresActive on
+	ExpiresDefault                              "access plus 1 month"
+	# cache.appcache needs re-requests in FF 3.6 (thanks Remy ~Introducing HTML5)
+	ExpiresByType text/cache-manifest           "access plus 0 seconds"
+	# Data
+	ExpiresByType text/xml                      "access plus 0 seconds"
+	ExpiresByType application/xml               "access plus 0 seconds"
+	ExpiresByType application/json              "access plus 0 seconds"
+	# Feed
+	ExpiresByType application/rss+xml           "access plus 1 hour"
+	ExpiresByType application/atom+xml          "access plus 1 hour"
+	# Favicon (cannot be renamed)
+	ExpiresByType image/x-icon                  "access plus 1 week"
+	# Media: images, video, audio
+	ExpiresByType image/gif                     "access plus 4 months"
+	ExpiresByType image/png                     "access plus 4 months"
+	ExpiresByType image/jpeg                    "access plus 4 months"
+	ExpiresByType image/webp                    "access plus 4 months"
+	ExpiresByType video/ogg                     "access plus 4 months"
+	ExpiresByType audio/ogg                     "access plus 4 months"
+	ExpiresByType video/mp4                     "access plus 4 months"
+	ExpiresByType video/webm                    "access plus 4 months"
+	# HTC files  (css3pie)
+	ExpiresByType text/x-component              "access plus 1 month"
+	# Webfonts
+	ExpiresByType font/ttf                      "access plus 4 months"
+	ExpiresByType font/otf                      "access plus 4 months"
+	ExpiresByType font/woff                     "access plus 4 months"
+	ExpiresByType font/woff2                    "access plus 4 months"
+	ExpiresByType image/svg+xml                 "access plus 1 month"
+	ExpiresByType application/vnd.ms-fontobject "access plus 1 month"
+	# CSS and JavaScript
+	ExpiresByType text/css                      "access plus 1 year"
+	ExpiresByType application/javascript        "access plus 1 year"
+</IfModule>
+# Gzip compression
+<IfModule mod_deflate.c>
+# Active compression
+SetOutputFilter DEFLATE
+# Force deflate for mangled headers
+<IfModule mod_setenvif.c>
+<IfModule mod_headers.c>
+SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+# Don’t compress images and other uncompressible content
+SetEnvIfNoCase Request_URI \
+\.(?:gif|jpe?g|png|rar|zip|exe|flv|mov|wma|mp3|avi|swf|mp?g|mp4|webm|webp|pdf)$ no-gzip dont-vary
+</IfModule>
+</IfModule>
+# Compress all output labeled with one of the following MIME-types
+<IfModule mod_filter.c>
+AddOutputFilterByType DEFLATE application/atom+xml \
+		                          application/javascript \
+		                          application/json \
+		                          application/rss+xml \
+		                          application/vnd.ms-fontobject \
+		                          application/x-font-ttf \
+		                          application/xhtml+xml \
+		                          application/xml \
+		                          font/opentype \
+		                          image/svg+xml \
+		                          image/x-icon \
+		                          text/css \
+		                          text/html \
+		                          text/plain \
+		                          text/x-component \
+		                          text/xml
+</IfModule>
+<IfModule mod_headers.c>
+Header append Vary: Accept-Encoding
+</IfModule>
+</IfModule>
+# END WP Rocket
+#Force HTTPS - DreamPress Server
+RewriteEngine On
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE] 
+Header always set Content-Security-Policy "upgrade-insecure-requests;"
+# Expire Headers
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Images
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  # Video
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType video/mpeg "access plus 1 year"
+  # CSS, JavaScript
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  # Others
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType application/x-shockwave-flash "access plus 1 month"
+</IfModule>
+
+Redirect 301 /lets-get-personal/ https://video.mdtmarketing.com/college-acceptance-campaign/
+
+Redirect 301 /wp-content/uploads/Ted-300x300.jpg https://mdtmarketing.com/wp-content/uploads/2020/11/Ted-300x300-2.jpg
+
+Redirect 301 /wp-content/uploads/Gary-Thorup-VP-Operations-300x300.jpg https://mdtmarketing.com/wp-content/uploads/2020/07/gary-thorup-headshot-02.jpg
+
+Redirect 301 /seo-audit/ https://mdtmarketing.com/digital-advertising/search-engine-optimization/
+
+Redirect 301 /wp-content/uploads/MDT2020-Marketing-Strategies-Guide.pdf/?$ /MDT2020-Marketing-Strategies-Guide.pdf
+
+Redirect 301 /production/ https://mdtmarketing.com/student-nurturing/
+
+
+
+
+Redirect 301 /overcoming-inquiry-management-challenges-of-higher-ed/ https://mdtmarketing.com/blog/breakdown/challenges-of-higher-ed/
+
+Redirect 301 /three-pillars-of-successful-sem-campaign/ https://mdtmarketing.com/blog/breakdown/three-pillars-of-success/
+
+Redirect 301 /breaking-up-part-2-moving-to-new-agency/ https://mdtmarketing.com/blog/breakdown/moving-to-new-agency-2/
+
+Redirect 301 /breaking-up-is-hard/ https://mdtmarketing.com/blog/breakdown/moving-to-new-agency/
+
+Redirect 301 /maximize-ppc-budget/ https://mdtmarketing.com/blog/breakdown/maximize-ppc-budget/
+
+Redirect 301 /targeting-voice-search/ https://mdtmarketing.com/blog/innovation/targeting-voice-search/
+
+Redirect 301 /preparing-marketing-file-for-print/ https://mdtmarketing.com/blog/breakdown/preparing-marketing-file-for-print/
+
+Redirect 301 /covering-your-digital-assets/ https://mdtmarketing.com/blog/breakdown/covering-your-digital-assets/
+
+Redirect 301 /personalized-video-lp/ https://mdtmarketing.com/student-nurturing/personalized-video/
+
+Redirect 301 /how-to-get-value-out-of-your-data/ https://mdtmarketing.com/blog/innovation/getting-value-out-of-data/
+
+Redirect 301 /time-management-key-digital-campaign-efficiency/ https://mdtmarketing.com/blog/breakdown/time-management-campaign-efficiency/
+
+Redirect 301 /choosing-a-student-recruitment-agency/ https://mdtmarketing.com/blog/breakdown/choosing-a-student-recruitment-agency/
+
+Redirect 301 /effective-marketing-strategy/ https://mdtmarketing.com/blog/breakdown/effective-marketing-strategy/
+
+Redirect 301 /artificial-intelligence-ethics/ https://mdtmarketing.com/blog/innovation/artificial-intelligence-ethics/
+
+
+Redirect 301 /personalizedvideo/ https://mdtmarketing.com/student-nurturing/personalized-video/
+
+Redirect 301 /blog/news/ https://mdtmarketing.com/news/
+Redirect 301 /blog/culture/ https://mdtmarketing.com/culture/
+Redirect 301 /blog/compliance/ https://mdtmarketing.com/compliance/
+Redirect 301 /blog/breakdown/ https://mdtmarketing.com/breakdown/
+Redirect 301 /blog/innovation/ https://mdtmarketing.com/innovation/
+
+
+Redirect 301 /blog/news https://mdtmarketing.com/news/
+Redirect 301 /blog/culture https://mdtmarketing.com/culture/
+Redirect 301 /blog/compliance https://mdtmarketing.com/compliance/
+Redirect 301 /blog/breakdown https://mdtmarketing.com/breakdown/
+Redirect 301 /blog/innovation https://mdtmarketing.com/innovation/
+
+
+
+Redirect 301 /coronavirus-best-practices/ https://mdtmarketing.com/blog/breakdown/coronavirus-best-practices/
+
+Redirect 301 /5-marketing-rules-to-remember/ https://mdtmarketing.com/blog/breakdown/5-marketing-rules-to-remember/
+
+Redirect 301 /now-about-this-content-thing/ https://mdtmarketing.com/blog/breakdown/now-about-this-content-thing/
+
+Redirect 301 /5-keys-to-hiring-and-retaining-talent/ https://mdtmarketing.com/blog/culture/5-keys-to-hiring-and-retaining-talent/
+
+Redirect 301 /marketing-challenge-correcting-inaccuracies-google-business-listings/ https://mdtmarketing.com/blog/breakdown/correcting-google-business-listings/
+
+Redirect 301 /ever-wonder-how-a-business-can-effectively-use-twitter/ https://mdtmarketing.com/blog/breakdown/effectively-use-twitter/
+
+Redirect 301 /the-increasing-challenge-of-ad-placement-during-the-decline-of-mass-media/ https://mdtmarketing.com/
+
+Redirect 301 /content https://mdtmarketing.com/blog/breakdown/increasing-challenge-of-ad-placement/
+
+Redirect 301 /the-state-of-internet-lead-generation/ https://mdtmarketing.com/blog/breakdown/state-of-internet-lead-generation/
+
+Redirect 301 /in-house-call-center-vs-location-based-calling/ https://mdtmarketing.com/blog/breakdown/call-center-vs-location-based/
+
+Redirect 301 /is-the-fcc-about-to-make-the-sky-fall/ https://mdtmarketing.com/blog/breakdown/fcc-about-to-make-the-sky-fall/
+
+Redirect 301 /apscu-best-practices-in-recruitment-and-admissions/ https://mdtmarketing.com/blog/breakdown/apscu-best-practices/
+
+Redirect 301 /why-is-your-mailbox-full-of-marketing-messages/ https://mdtmarketing.com/blog/breakdown/mailbox-full-of-marketing-messages/
+
+Redirect 301 /visual-storytelling-the-new-content-marketing-takeaways-from-the-1st-annual-visual-storytelling-summit/ https://mdtmarketing.com/blog/breakdown/1st-annual-visual-storytelling-summit/
+
+Redirect 301 /new-feature-now-you-can-swipe-left-and-right-to-browse-online-courses-in-google-highered/ https://mdtmarketing.com/blog/innovation/browse-online-courses-in-google-highered/
+
+Redirect 301 /marketing-challenges-blog-series-addressing-marketing-questions/ https://mdtmarketing.com/blog/breakdown/addressing-marketing-questions/
+
+Redirect 301 /mdt-marketing-recipient-of-first-ever-spirit-of-fapsc-award/ https://mdtmarketing.com/blog/news/spirit-of-fapsc-award/
+
+Redirect 301 /fapsc-associate-member-of-the-year-award/ https://mdtmarketing.com/blog/news/fapsc-associate-member-of-the-year-award/
+
+Redirect 301 /internet-marketing-made-effective/ https://mdtmarketing.com/blog/breakdown/internet-marketing-made-effective/
+
+Redirect 301 /four-must-read-practical-steps-to-hiring-internet-marketing-professionals/ https://mdtmarketing.com/blog/breakdown/practical-steps-to-hiring-internet-marketing-professionals/
+
+Redirect 301 /make-it-personal-get-better-email-campaign-results/ https://mdtmarketing.com/blog/breakdown/better-email-campaign-results/
+
+Redirect 301 /ceos-cios-cfos-the-only-things-you-need-to-know-about-your-paid-search-team/ https://mdtmarketing.com/blog/breakdown/ceos-cios-cfos/
+
+Redirect 301 /arro-personalized-cross-media-follow-up-campaign-to-lift-enrollments/ https://mdtmarketing.com/blog/breakdown/follow-up-campaign-to-lift-enrollments/
+
+Redirect 301 /learn-all-about-the-latest-penguin-update-and-how-to-scale-an-in-house-seo-team-at-pubcon-las-vegas-2016-with-google-and-mdt-marketing/ https://mdtmarketing.com/blog/breakdown/2016-with-google-and-mdt-marketing/
+
+Redirect 301 /3-keys-to-understanding-your-seo-needs/ https://mdtmarketing.com/blog/breakdown/3-keys-to-understanding-your-seo-needs/
+
+Redirect 301 /identifying-and-curtailing-advertising-misrepresentation-and-fraud/ https://mdtmarketing.com/blog/compliance/advertising-misrepresentation-and-fraud/
+
+Redirect 301 /fcc-amendments-and-for-profit-school-recruitment-compliance-is-critical/ https://mdtmarketing.com/blog/compliance/school-recruitment-compliance-is-critical/
+
+Redirect 301 /the-fcc-the-tpca-and-the-need-for-more-answers/ https://mdtmarketing.com/blog/compliance/fcc-the-tpca-and-the-need-for-more-answers/
+
+Redirect 301 /preview-dialing-court-rules-not-manual-enough-for-tcpa-compliance/ https://mdtmarketing.com/blog/compliance/court-rules-not-manual-enough/
+
+Redirect 301 /apscu-notice-regarding-tcpa-new-guidelines/ https://mdtmarketing.com/blog/compliance/apscu-notice-regarding-tcpa-new-guidelines/
+
+Redirect 301 /new-web-design-not-just-another-pretty-facelift/ https://mdtmarketing.com/blog/culture/web-redesigns-are-not-facelifts/
+
+Redirect 301 /effective-higher-education-marketing-a-view-from-both-sides/ https://mdtmarketing.com/blog/culture/effective-higher-education-marketing/
+
+Redirect 301 /we-will-be-ready-rising-to-the-challenge-like-the-generations-before-us/ https://mdtmarketing.com/blog/culture/rising-to-the-challenge/
+
+Redirect 301 /hitchhiking-in-the-1970s/ https://mdtmarketing.com/blog/culture/hitchhiking-in-the-1970s/
+
+Redirect 301 /what-we-do-matters/ https://mdtmarketing.com/blog/culture/what-we-do-matters/
+
+Redirect 301 /open-letter-to-career-ed/ https://mdtmarketing.com/blog/culture/open-letter-to-career-ed/
+
+Redirect 301 /cecu-president-statement/ https://mdtmarketing.com/blog/culture/cecu-president-statement/
+
+Redirect 301 /passionate-people-building-relationships/ https://mdtmarketing.com/blog/culture/passionate-people-building-relationships/
+
+Redirect 301 /25-years-in-business/ https://mdtmarketing.com/blog/culture/25-years-in-business/
+
+Redirect 301 /recognizing-unstable-marketing-agencies-2/ https://mdtmarketing.com/blog/culture/recognizing-unstable-marketing-agencies-2/
+
+Redirect 301 /in-support-of-for-profit-education/ https://mdtmarketing.com/blog/news/in-support-of-for-profit-education/
+
+Redirect 301 /the-dark-side-of-social-media-and-technology-the-misuse-of-our-personal-data/ https://mdtmarketing.com/blog/culture/social-media-misuse-of-personal-data/
+
+Redirect 301 /its-not-just-about-the-message-any-more/ https://mdtmarketing.com/blog/breakdown/not-just-about-the-message-any-more/
+
+Redirect 301 /privacy-weighing-the-benefits-of-personalized-marketing-communications-with-a-persons-right-to-privacy/ https://mdtmarketing.com/blog/culture/privacy-weighing-the-benefits-of-personalized-marketing/
+
+Redirect 301 /mdt-bowls-for-big-brothers-big-sisters/ https://mdtmarketing.com/blog/culture/mdt-bowls-for-big-brothers-big-sisters/
+
+Redirect 301 /10-impactful-stats-of-the-day/ https://mdtmarketing.com/blog/innovation/10-impactful-stats-of-the-day/
+
+Redirect 301 /big-throwback-into-the-80s-by-brands-returns-hilarious-tweets/ https://mdtmarketing.com/blog/culture/80s-by-brands-returns
+
+Redirect 301 /at-apscu-symposium-2015-pride-and-a-reinvigorated-sense-of-purpose/ https://mdtmarketing.com/blog/news/apscu-symposium-2015-pride-sense-of-purpose/
+
+Redirect 301 /defending-private-sector-education-the-right-thing-to-do/ https://mdtmarketing.com/blog/culture/defending-private-sector-education/
+
+Redirect 301 /leadership-in-the-21st-century/ https://mdtmarketing.com/blog/culture/leadership-in-the-21st-century/
+
+Redirect 301 /our-culture-focus-and-people-make-me-proud/ https://mdtmarketing.com/blog/culture/our-culture-focus-and-people-make-me-proud/
+
+Redirect 301 /postsecondary-education-in-crisis/ https://mdtmarketing.com/blog/culture/postsecondary-education-in-crisis/
+
+Redirect 301 /private-sector-education-and-the-people-they-serve-matter/ https://mdtmarketing.com/blog/culture/private-education-and-people-they-serve-matter/
+
+Redirect 301 /gen-z-social-media/ https://mdtmarketing.com/blog/innovation/gen-z-social-media/
+
+Redirect 301 /its-time-to-add-augmented-reality-to-your-marketing-strategy/ https://mdtmarketing.com/blog/innovation/augmented-reality-marketing-strategy/
+
+Redirect 301 /riding-pandemic-rollercoaster-5-marketing-mistakes/ https://mdtmarketing.com/blog/breakdown/pandemic-rollercoaster-5-marketing-mistakes/
+
+Redirect 301 /my-experience-back-at-leadscon/ https://mdtmarketing.com/blog/innovation/my-experience-back-at-leadscon/
+
+Redirect 301 /my-experience-back-at-leadscon/ https://mdtmarketing.com/blog/innovation/my-experience-back-at-leadscon/
+
+Redirect 301 /time-to-put-mobile-advertising-to-the-test/ https://mdtmarketing.com/blog/innovation/mobile-advertising-to-the-test/
+
+Redirect 301 /top-3-trends-in-marketing-technology-automation-sempocities-lynnuniversity/ https://mdtmarketing.com/blog/innovation/top-3-trends-in-marketing-technology
+
+Redirect 301 /names-matter-colleges-rebrand-to-get-more-students/ https://mdtmarketing.com/blog/news/colleges-rebrand-to-get-more-students/
+
+Redirect 301 /technology-explosion-product-innovation-and-change-fueling-the-need-for-better-education/ https://mdtmarketing.com/blog/innovation/fueling-the-need-for-better-education/
+
+Redirect 301 /the-history-of-advertising-in-60-seconds/ https://mdtmarketing.com/blog/innovation/history-of-advertising-in-60-seconds/
+
+Redirect 301 /leading-transformation/ https://mdtmarketing.com/blog/news/leading-transformation/
+
+Redirect 301 /allied-member-of-the-year-mitch-talenfeld/ https://mdtmarketing.com/blog/news/allied-member-of-the-year-mitch-talenfeld/
+
+Redirect 301 /another-gold-star-for-for-profit-education/ https://mdtmarketing.com/blog/news/gold-star-for-for-profit-education/
+
+Redirect 301 /fapsc-presentation-sneak-peak/ https://mdtmarketing.com/blog/news/fapsc-presentation-sneak-peak/
+
+Redirect 301 /apscu-vs-duncan-court-ruling-summary/ https://mdtmarketing.com/blog/news/apscu-vs-duncan-court-ruling-summary/
+
+Redirect 301 /florida-leaders-oppose-higher-education-regulation/ https://mdtmarketing.com/blog/news/florida-leaders-oppose-higher-education-regulation/
+
+Redirect 301 /ftc-confirms-rules-will-stand/ https://mdtmarketing.com/blog/news/ftc-confirms-rules-will-stand/
+
+Redirect 301 /welcome-new-mdt-marketing-website/ https://mdtmarketing.com/blog/news/new-mdt-marketing-website/
+
+Redirect 301 /mdt-marketing-participates-in-career-city-2015-at-dillard-elementary/ https://mdtmarketing.com/blog/news/mdt-marketing-participates-in-career-city-2015/
+
+Redirect 301 /personalized-marketing-campaigns-the-difference-between-emails-opened-or-not-opened/ https://mdtmarketing.com/blog/breakdown/difference-between-emails-opened-or-not-opened/
+
+Redirect 301 /welcome-to-mdt-marketing/ https://mdtmarketing.com/blog/news/welcome-to-mdt-marketing/
+
+Redirect 301 /reaching-the-high-school-student/ https://mdtmarketing.com/blog/innovation/reaching-high-school-students/
+
+Redirect 301 /mdt-makes-its-quarterly-kiva-investments/ https://mdtmarketing.com/blog/news/mdt-makes-its-quarterly-kiva-investments/
+
+Redirect 301 /top-5-cant-miss-super-bowl-ads-mdts-early-picks/ https://mdtmarketing.com/blog/culture/5-cant-miss-super-bowl-ads
+
+Redirect 301 /ged-certificates-drop-nearly-90-in-2014/ https://mdtmarketing.com/blog/news/ged-certificates-drop-nearly-90-in-2014/
+
+Redirect 301 /fapsc-is-working-to-make-higher-education-more-accessible-for-all/ https://mdtmarketing.com/blog/news/higher-education-more-accessible-for-all/
+
+Redirect 301 /google-policy-change-brings-much-needed-transparency-to-third-party-agency-pricing-on-adwords-accounts/ https://mdtmarketing.com/blog/news/third-party-agency-pricing-on-adwords-accounts/
+
+Redirect 301 /like-it-or-not-google-just-made-college-disclaimer-info-headline-news/ https://mdtmarketing.com/blog/news/college-disclaimer-info-headline-news/
+
+Redirect 301 /mdt-and-other-search-marketing-titans-on-a-panel-oct-18th-at-lynn-university-in-boca-raton-for-sempocities/ https://mdtmarketing.com/blog/news/mdt-at-lynn-university-in-boca-raton-for-sempocities/
+
+Redirect 301 /its-official-mdt-marketing-is-now-a-google-premier-partner/ https://mdtmarketing.com/blog/news/mdt-marketing-is-now-a-google-premier-partner/
+
+Redirect 301 /googles-major-changes-this-month-could-affect-up-to-50-of-your-website-traffic/ https://mdtmarketing.com/blog/news/googles-major-changes-this-month/
+
+Redirect 301 /free-community-college-doesnt-it-already-exist/ https://mdtmarketing.com/blog/culture/free-community-college-doesnt-it-already-exist/
+
+Redirect 301 /category/federal-regulations/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /category/call-management/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/how-to-do-it-yourself/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/social-media/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/mdt-solves-marketing-challenges/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/mdt-solves-marketing-challenges/page/2/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/mdt-solves-marketing-challenges/page/3/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/social-media/page/2/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/social-media/page/3/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/how-to-do-it-yourself/page/2/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /category/federal-regulations/page/2/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /federal-regulations/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /careers/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /conference/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /corporate-events/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /education/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /events/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /call-management/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /future-of-media/ https://mdtmarketing.com/blog/breakdown/
+
+
+
+Redirect 301 /general-advertising/ https://mdtmarketing.com/blog/innovation/
+
+Redirect 301 /how-to-do-it-yourself/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /industry-news/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /inquiry-management/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /internet-advertising/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /lead-management/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /mdt-solves-marketing-challenges/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /marketing-challenges/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /media/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /personalized-communications/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /regulation-compliance/ https://mdtmarketing.com/blog/compliance/
+
+Redirect 301 /sempo-cities/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /social-media/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /technology/ https://mdtmarketing.com/blog/innovation/
+
+Redirect 301 /uncategorized/ https://mdtmarketing.com/blog/breakdown/
+
+Redirect 301 /what-were-reading/ https://mdtmarketing.com/blog/news/
+
+Redirect 301 /internet-advertising-management/ https://mdtmarketing.com/digital-advertising/internet-advertising-management/
+
+Redirect 301 /overcoming-inquiry-management-challenges-of-higher-ed https://mdtmarketing.com/blog/breakdown/challenges-of-higher-ed/
+
+Redirect 301 /three-pillars-of-successful-sem-campaign https://mdtmarketing.com/blog/breakdown/three-pillars-of-success/
+
+
+
+
+
+# BEGIN WordPress
+# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
+# dynamically generated, and should only be modified via WordPress filters.
+# Any changes to the directives between these markers will be overwritten.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+
+# Backup Migration START
+  <IfModule mod_rewrite.c>
+
+    RewriteEngine On
+    RewriteRule .* - [E=noconntimeout:1,E=noabort:1]
+
+  </IfModule>
+  <IfModule mod_env>
+
+    SetEnv noabort 1
+
+  </IfModule>
+# Backup Migration END
